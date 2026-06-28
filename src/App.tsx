@@ -13,6 +13,7 @@ import { DecisionSupport } from './pages/DecisionSupport';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { About } from './pages/About';
+import { AqiIndia } from './pages/AqiIndia';
 import { Layout } from './components/Layout';
 
 const AnimatedRoutes: React.FC = () => {
@@ -59,6 +60,7 @@ const AnimatedRoutes: React.FC = () => {
         <Route path="/reports" element={renderWithLayout(Reports)} />
         <Route path="/settings" element={renderWithLayout(Settings)} />
         <Route path="/about" element={renderWithLayout(About)} />
+        <Route path="/aqi-india" element={renderWithLayout(AqiIndia)} />
       </Routes>
     </AnimatePresence>
   );

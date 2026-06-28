@@ -53,6 +53,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Live Monitoring', path: '/live', icon: Radio },
+    { name: 'AQI India', path: '/aqi-india', icon: Wind },
     { name: 'HCHO Analysis', path: '/hcho', icon: Atom },
     { name: 'Fire Detection', path: '/fire', icon: Flame },
     { name: 'Wind Analysis', path: '/wind', icon: Wind },
@@ -340,11 +341,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <span className="text-[9px] font-mono mt-1">Live</span>
           </button>
           <button 
-            onClick={() => handleNavClick('/hcho')} 
-            className={`flex flex-col items-center justify-center ${isActive('/hcho') ? 'text-space-cyan' : 'text-slate-400'}`}
+            onClick={() => handleNavClick('/aqi-india')} 
+            className={`flex flex-col items-center justify-center ${isActive('/aqi-india') ? 'text-space-cyan' : 'text-slate-400'}`}
           >
-            <Atom className="w-5 h-5" />
-            <span className="text-[9px] font-mono mt-1">HCHO</span>
+            <Wind className="w-5 h-5" />
+            <span className="text-[9px] font-mono mt-1">AQI India</span>
           </button>
           <button 
             onClick={() => handleNavClick('/fire')} 

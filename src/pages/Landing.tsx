@@ -14,6 +14,21 @@ export const Landing: React.FC = () => {
       {/* Space Background */}
       <Starfield />
 
+      {/* Background Video */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover filter contrast-[2.0] brightness-[0.9] saturate-[2.1]"
+        >
+          <source src="/videos/dashboard-bg.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay to blend video with background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050A15]/20 via-[#050A15]/45 to-[#050A15]" />
+      </div>
+
       {/* Main Container */}
       <div className="relative z-10 w-full max-w-5xl flex flex-col items-center text-center space-y-12 my-auto">
         
