@@ -72,16 +72,16 @@ export const MapPlaceholder: React.FC<MapPlaceholderProps> = ({
           <div className="radar-sweep-indicator opacity-20" />
         </div>
 
-        {/* Satellite Map Vector Mock */}
-        <div className="absolute inset-0 p-8 flex items-center justify-center opacity-25 select-none pointer-events-none transition-transform duration-300" style={{ transform: `scale(${zoom})` }}>
-          <svg viewBox="0 0 800 500" className="w-full h-full text-space-cyan" stroke="currentColor" fill="none" strokeWidth="0.8">
-            {/* Outline of Indian Peninsula and South Asia region (Simulated Vector Map) */}
-            <path d="M 320,100 Q 300,120 290,140 T 260,180 T 220,220 T 200,240 L 210,250 L 250,230 L 280,240 L 310,210 L 330,220 L 350,200 L 370,230 L 380,260 T 360,300 T 350,340 T 370,380 T 400,410 T 410,430 L 415,440 L 420,430 T 435,400 T 450,360 T 465,300 T 490,260 T 520,240 T 550,230 L 580,240 L 610,210 L 630,220 L 650,200 L 670,230 L 690,260 L 720,240 L 730,220" />
-            <path d="M 412,430 L 417,435 L 422,430 L 418,415 Z" /> {/* Sri Lanka outline */}
-            <circle cx="400" cy="220" r="10" strokeDasharray="2,2" className="animate-spin" style={{ animationDuration: '20s' }} />
-            <circle cx="350" cy="180" r="15" strokeDasharray="3,3" />
-            <circle cx="480" cy="300" r="8" strokeDasharray="1,1" />
-          </svg>
+        {/* Google Map of India */}
+        <div className="absolute inset-0 select-none opacity-40 transition-transform duration-300" style={{ transform: `scale(${zoom})` }}>
+          <iframe
+            title="Google Map of India"
+            src={`https://maps.google.com/maps?q=India&t=&z=${Math.round(5 + (zoom - 1.0) * 4)}&ie=UTF8&iwloc=&output=embed`}
+            className="w-full h-full border-0 invert grayscale contrast-[1.2]"
+            allowFullScreen={false}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
 
         {/* Dynamic heatmap points based on active layer */}

@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Wind, 
   AlertTriangle, 
   ThumbsUp, 
   Activity, 
-  Filter, 
   MapPin, 
   Thermometer, 
   Droplets,
   Heart,
-  Shield,
-  Home
+  RefreshCw
 } from 'lucide-react';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedCounter } from '../components/AnimatedCounter';
@@ -19,6 +17,8 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 interface CityAqiData {
   city: string;
   state: string;
+  lat: number;
+  lon: number;
   aqi: number;
   pm25: number;
   pm10: number;
@@ -30,34 +30,111 @@ interface CityAqiData {
 }
 
 const cityDataList: CityAqiData[] = [
-  { city: "Delhi", state: "Delhi", aqi: 324, pm25: 274, pm10: 388, so2: 12.5, no2: 48.2, co: 2.1, temp: 38, humidity: 42 },
-  { city: "Mumbai", state: "Maharashtra", aqi: 84, pm25: 28, pm10: 74, so2: 6.2, no2: 24.5, co: 0.8, temp: 31, humidity: 82 },
-  { city: "Bengaluru", state: "Karnataka", aqi: 42, pm25: 11, pm10: 35, so2: 3.1, no2: 12.8, co: 0.4, temp: 27, humidity: 65 },
-  { city: "Chennai", state: "Tamil Nadu", aqi: 56, pm25: 16, pm10: 48, so2: 5.4, no2: 18.2, co: 0.6, temp: 33, humidity: 75 },
-  { city: "Kolkata", state: "West Bengal", aqi: 142, pm25: 52, pm10: 124, so2: 9.8, no2: 32.4, co: 1.2, temp: 34, humidity: 80 },
-  { city: "Hyderabad", state: "Telangana", aqi: 78, pm25: 25, pm10: 68, so2: 5.1, no2: 22.0, co: 0.7, temp: 32, humidity: 55 },
-  { city: "Ahmedabad", state: "Gujarat", aqi: 165, pm25: 84, pm10: 154, so2: 8.5, no2: 28.6, co: 1.4, temp: 39, humidity: 38 },
-  { city: "Pune", state: "Maharashtra", aqi: 62, pm25: 18, pm10: 52, so2: 4.2, no2: 15.6, co: 0.5, temp: 30, humidity: 68 },
-  { city: "Patna", state: "Bihar", aqi: 245, pm25: 195, pm10: 290, so2: 11.2, no2: 41.5, co: 1.8, temp: 36, humidity: 50 },
-  { city: "Lucknow", state: "Uttar Pradesh", aqi: 280, pm25: 230, pm10: 320, so2: 12.0, no2: 45.1, co: 1.9, temp: 37, humidity: 48 },
-  { city: "Jaipur", state: "Rajasthan", aqi: 128, pm25: 46, pm10: 110, so2: 6.8, no2: 20.4, co: 1.1, temp: 38, humidity: 30 },
-  { city: "Bhopal", state: "Madhya Pradesh", aqi: 95, pm25: 32, pm10: 82, so2: 5.8, no2: 19.8, co: 0.9, temp: 35, humidity: 45 },
-  { city: "Chandigarh", state: "Punjab", aqi: 115, pm25: 41, pm10: 98, so2: 7.2, no2: 22.5, co: 1.0, temp: 34, humidity: 52 },
-  { city: "Srinagar", state: "Jammu & Kashmir", aqi: 35, pm25: 8, pm10: 28, so2: 2.1, no2: 8.4, co: 0.3, temp: 22, humidity: 60 },
-  { city: "Guwahati", state: "Assam", aqi: 130, pm25: 48, pm10: 115, so2: 8.0, no2: 25.4, co: 1.1, temp: 31, humidity: 85 },
-  { city: "Kochi", state: "Kerala", aqi: 38, pm25: 9, pm10: 31, so2: 2.8, no2: 11.2, co: 0.4, temp: 30, humidity: 88 },
-  { city: "Visakhapatnam", state: "Andhra Pradesh", aqi: 68, pm25: 20, pm10: 58, so2: 4.8, no2: 17.5, co: 0.6, temp: 31, humidity: 78 },
-  { city: "Raipur", state: "Chhattisgarh", aqi: 188, pm25: 138, pm10: 208, so2: 9.5, no2: 34.6, co: 1.5, temp: 36, humidity: 40 },
-  { city: "Ranchi", state: "Jharkhand", aqi: 125, pm25: 45, pm10: 108, so2: 7.0, no2: 23.4, co: 1.0, temp: 32, humidity: 55 },
-  { city: "Dehradun", state: "Uttarakhand", aqi: 48, pm25: 14, pm10: 38, so2: 3.5, no2: 13.2, co: 0.5, temp: 28, humidity: 58 }
+  { city: "Delhi", state: "Delhi", lat: 28.6139, lon: 77.2090, aqi: 324, pm25: 274, pm10: 388, so2: 12.5, no2: 48.2, co: 2.1, temp: 38, humidity: 42 },
+  { city: "Mumbai", state: "Maharashtra", lat: 19.0760, lon: 72.8777, aqi: 84, pm25: 28, pm10: 74, so2: 6.2, no2: 24.5, co: 0.8, temp: 31, humidity: 82 },
+  { city: "Bengaluru", state: "Karnataka", lat: 12.9716, lon: 77.5946, aqi: 42, pm25: 11, pm10: 35, so2: 3.1, no2: 12.8, co: 0.4, temp: 27, humidity: 65 },
+  { city: "Chennai", state: "Tamil Nadu", lat: 13.0827, lon: 80.2707, aqi: 56, pm25: 16, pm10: 48, so2: 5.4, no2: 18.2, co: 0.6, temp: 33, humidity: 75 },
+  { city: "Kolkata", state: "West Bengal", lat: 22.5726, lon: 88.3639, aqi: 142, pm25: 52, pm10: 124, so2: 9.8, no2: 32.4, co: 1.2, temp: 34, humidity: 80 },
+  { city: "Hyderabad", state: "Telangana", lat: 17.3850, lon: 78.4867, aqi: 78, pm25: 25, pm10: 68, so2: 5.1, no2: 22.0, co: 0.7, temp: 32, humidity: 55 },
+  { city: "Ahmedabad", state: "Gujarat", lat: 23.0225, lon: 72.5714, aqi: 165, pm25: 84, pm10: 154, so2: 8.5, no2: 28.6, co: 1.4, temp: 39, humidity: 38 },
+  { city: "Pune", state: "Maharashtra", lat: 18.5204, lon: 73.8567, aqi: 62, pm25: 18, pm10: 52, so2: 4.2, no2: 15.6, co: 0.5, temp: 30, humidity: 68 },
+  { city: "Patna", state: "Bihar", lat: 25.5941, lon: 85.1376, aqi: 245, pm25: 195, pm10: 290, so2: 11.2, no2: 41.5, co: 1.8, temp: 36, humidity: 50 },
+  { city: "Lucknow", state: "Uttar Pradesh", lat: 26.8467, lon: 80.9462, aqi: 280, pm25: 230, pm10: 320, so2: 12.0, no2: 45.1, co: 1.9, temp: 37, humidity: 48 },
+  { city: "Jaipur", state: "Rajasthan", lat: 26.9124, lon: 75.7873, aqi: 128, pm25: 46, pm10: 110, so2: 6.8, no2: 20.4, co: 1.1, temp: 38, humidity: 30 },
+  { city: "Bhopal", state: "Madhya Pradesh", lat: 23.2599, lon: 77.4126, aqi: 95, pm25: 32, pm10: 82, so2: 5.8, no2: 19.8, co: 0.9, temp: 35, humidity: 45 },
+  { city: "Chandigarh", state: "Punjab", lat: 30.7333, lon: 76.7794, aqi: 115, pm25: 41, pm10: 98, so2: 7.2, no2: 22.5, co: 1.0, temp: 34, humidity: 52 },
+  { city: "Srinagar", state: "Jammu & Kashmir", lat: 34.0837, lon: 74.7973, aqi: 35, pm25: 8, pm10: 28, so2: 2.1, no2: 8.4, co: 0.3, temp: 22, humidity: 60 },
+  { city: "Guwahati", state: "Assam", lat: 26.1445, lon: 91.7362, aqi: 130, pm25: 48, pm10: 115, so2: 8.0, no2: 25.4, co: 1.1, temp: 31, humidity: 85 },
+  { city: "Kochi", state: "Kerala", lat: 9.9312, lon: 76.2673, aqi: 38, pm25: 9, pm10: 31, so2: 2.8, no2: 11.2, co: 0.4, temp: 30, humidity: 88 },
+  { city: "Visakhapatnam", state: "Andhra Pradesh", lat: 17.6868, lon: 83.2185, aqi: 68, pm25: 20, pm10: 58, so2: 4.8, no2: 17.5, co: 0.6, temp: 31, humidity: 78 },
+  { city: "Raipur", state: "Chhattisgarh", lat: 21.2514, lon: 81.6296, aqi: 188, pm25: 138, pm10: 208, so2: 9.5, no2: 34.6, co: 1.5, temp: 36, humidity: 40 },
+  { city: "Ranchi", state: "Jharkhand", lat: 23.3441, lon: 85.3096, aqi: 125, pm25: 45, pm10: 108, so2: 7.0, no2: 23.4, co: 1.0, temp: 32, humidity: 55 },
+  { city: "Dehradun", state: "Uttarakhand", lat: 30.3165, lon: 78.0322, aqi: 48, pm25: 14, pm10: 38, so2: 3.5, no2: 13.2, co: 0.5, temp: 28, humidity: 58 }
 ];
 
+const calculateIndianAqi = (pm25: number, pm10: number): number => {
+  let aqi25 = 0;
+  if (pm25 <= 30) aqi25 = (pm25 * 50) / 30;
+  else if (pm25 <= 60) aqi25 = 50 + ((pm25 - 30) * 50) / 30;
+  else if (pm25 <= 90) aqi25 = 100 + ((pm25 - 60) * 100) / 30;
+  else if (pm25 <= 120) aqi25 = 200 + ((pm25 - 90) * 100) / 30;
+  else if (pm25 <= 250) aqi25 = 300 + ((pm25 - 120) * 100) / 130;
+  else aqi25 = 400 + ((pm25 - 250) * 100) / 150;
+
+  let aqi10 = 0;
+  if (pm10 <= 50) aqi10 = (pm10 * 50) / 50;
+  else if (pm10 <= 100) aqi10 = 50 + ((pm10 - 50) * 50) / 50;
+  else if (pm10 <= 250) aqi10 = 100 + ((pm10 - 100) * 100) / 150;
+  else if (pm10 <= 350) aqi10 = 200 + ((pm10 - 250) * 100) / 100;
+  else if (pm10 <= 430) aqi10 = 300 + ((pm10 - 350) * 100) / 80;
+  else aqi10 = 400 + ((pm10 - 430) * 100) / 100;
+
+  return Math.round(Math.max(aqi25, aqi10));
+};
+
 export const AqiIndia: React.FC = () => {
+  const [citiesList, setCitiesList] = useState<CityAqiData[]>(cityDataList);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCityName, setSelectedCityName] = useState("Delhi");
   const [statusFilter, setStatusFilter] = useState<'all' | 'good' | 'moderate' | 'poor' | 'unhealthy' | 'severe'>('all');
+  const [isLive, setIsLive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>("SIMULATED");
 
-  const selectedCity = cityDataList.find(c => c.city === selectedCityName) || cityDataList[0];
+  const selectedCity = citiesList.find(c => c.city === selectedCityName) || citiesList[0];
+
+  const fetchLiveData = async () => {
+    setLoading(true);
+    try {
+      const lats = cityDataList.map(c => c.lat).join(',');
+      const lons = cityDataList.map(c => c.lon).join(',');
+      
+      const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lats}&longitude=${lons}&current=pm2_5,pm10,nitrogen_dioxide,sulfur_dioxide,carbon_monoxide`);
+      const aqiJson = await aqiRes.json();
+      
+      const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m`);
+      const weatherJson = await weatherRes.json();
+
+      const updatedCities = cityDataList.map((city, index) => {
+        const aqiData = Array.isArray(aqiJson) ? aqiJson[index]?.current : aqiJson?.current;
+        const weatherData = Array.isArray(weatherJson) ? weatherJson[index]?.current : weatherJson?.current;
+
+        const pm25 = aqiData?.pm2_5 ? Math.round(aqiData.pm2_5) : city.pm25;
+        const pm10 = aqiData?.pm10 ? Math.round(aqiData.pm10) : city.pm10;
+        const so2 = aqiData?.sulfur_dioxide ? Number((aqiData.sulfur_dioxide).toFixed(1)) : city.so2;
+        const no2 = aqiData?.nitrogen_dioxide ? Number((aqiData.nitrogen_dioxide).toFixed(1)) : city.no2;
+        const co = aqiData?.carbon_monoxide ? Number((aqiData.carbon_monoxide / 1000).toFixed(2)) : city.co;
+        
+        const temp = weatherData?.temperature_2m ? Math.round(weatherData.temperature_2m) : city.temp;
+        const humidity = weatherData?.relative_humidity_2m ? Math.round(weatherData.relative_humidity_2m) : city.humidity;
+        const aqi = calculateIndianAqi(pm25, pm10);
+
+        return {
+          ...city,
+          aqi,
+          pm25,
+          pm10,
+          so2,
+          no2,
+          co,
+          temp,
+          humidity
+        };
+      });
+
+      setCitiesList(updatedCities);
+      setIsLive(true);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch (error) {
+      console.error("Error fetching live AQI telemetry:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveData();
+  }, []);
 
   const getAqiCategory = (aqi: number) => {
     if (aqi <= 50) return { label: "Good", color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-500/20", glow: "glow-emerald", desc: "Minimal impact. Safe for outdoor activities." };
@@ -67,7 +144,7 @@ export const AqiIndia: React.FC = () => {
     return { label: "Severe", color: "text-red-600", bg: "bg-red-950/20 border-red-600/30", glow: "glow-red", desc: "Healthy people also experience breathing effects; serious health impact." };
   };
 
-  const filteredCities = cityDataList.filter(city => {
+  const filteredCities = citiesList.filter(city => {
     const matchesSearch = city.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           city.state.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -80,11 +157,11 @@ export const AqiIndia: React.FC = () => {
     return matchesSearch;
   });
 
-  const sortedByPollution = [...cityDataList].sort((a, b) => b.aqi - a.aqi);
+  const sortedByPollution = [...citiesList].sort((a, b) => b.aqi - a.aqi);
   const topPolluted = sortedByPollution.slice(0, 5);
-  const topCleanest = [...cityDataList].sort((a, b) => a.aqi - b.aqi).slice(0, 5);
+  const topCleanest = [...citiesList].sort((a, b) => a.aqi - b.aqi).slice(0, 5);
 
-  const averageNationalAqi = Math.round(cityDataList.reduce((acc, c) => acc + c.aqi, 0) / cityDataList.length);
+  const averageNationalAqi = Math.round(citiesList.reduce((acc, c) => acc + c.aqi, 0) / citiesList.length);
 
   return (
     <div className="space-y-6">
@@ -107,12 +184,25 @@ export const AqiIndia: React.FC = () => {
             </p>
           </div>
           
-          <div className="bg-[#050A15] border border-space-cyan/20 px-4 py-2 rounded-sm font-mono text-xs">
-            <div className="text-slate-500 text-[9px] uppercase tracking-wider">NATIONAL STATUS</div>
-            <div className="text-space-orange font-bold flex items-center space-x-1.5 mt-0.5">
-              <Activity className="w-3.5 h-3.5 animate-pulse text-space-orange" />
-              <span>MODERATE POLLUTION GRID</span>
+          <div className="bg-[#050A15] border border-space-cyan/20 px-4 py-2 rounded-sm font-mono text-xs flex items-center space-x-4">
+            <div>
+              <div className="text-slate-550 text-[9px] uppercase tracking-wider">GRID FEED UPDATE</div>
+              <div className="text-space-cyan font-bold flex items-center space-x-1.5 mt-0.5 font-mono">
+                <span className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-space-orange animate-ping'}`} />
+                <span>{lastUpdated}</span>
+              </div>
             </div>
+            {loading ? (
+              <RefreshCw className="w-4 h-4 text-space-cyan animate-spin" />
+            ) : (
+              <button 
+                onClick={fetchLiveData} 
+                className="p-1 border border-slate-800 hover:border-slate-600 rounded-sm text-slate-400 hover:text-space-cyan transition-colors"
+                title="Refresh Live Data"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </GlassCard>

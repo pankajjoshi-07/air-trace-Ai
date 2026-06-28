@@ -14,6 +14,9 @@ import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { About } from './pages/About';
 import { AqiIndia } from './pages/AqiIndia';
+import { SatelliteData } from './pages/SatelliteData';
+import { CpcbAqi } from './pages/CpcbAqi';
+import { SatelliteToSurface } from './pages/SatelliteToSurface';
 import { Layout } from './components/Layout';
 
 const AnimatedRoutes: React.FC = () => {
@@ -61,6 +64,9 @@ const AnimatedRoutes: React.FC = () => {
         <Route path="/settings" element={renderWithLayout(Settings)} />
         <Route path="/about" element={renderWithLayout(About)} />
         <Route path="/aqi-india" element={renderWithLayout(AqiIndia)} />
+        <Route path="/satellite-data" element={renderWithLayout(SatelliteData)} />
+        <Route path="/satellite-to-surface" element={renderWithLayout(SatelliteToSurface)} />
+        <Route path="/cpcb-aqi" element={renderWithLayout(CpcbAqi)} />
       </Routes>
     </AnimatePresence>
   );
